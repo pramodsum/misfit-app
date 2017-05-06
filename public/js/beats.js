@@ -11,8 +11,8 @@ var AudioHandler = function() {
 	var bpmStart;
 
 	var BEAT_HOLD_TIME = 40; //num of frames to hold a beat
-	var BEAT_DECAY_RATE = 0.98;
-	var BEAT_MIN = 0.55; //a volume less than this is no beat
+	var BEAT_DECAY_RATE = 0.88;
+	var BEAT_MIN = 0.15; //a volume less than this is no beat
 
 	//BPM STUFF
 	var count = 0;
@@ -24,19 +24,11 @@ var AudioHandler = function() {
 	var gotBeat = false;
 	var beatCutOff = 0;
 	var beatTime = 0;
-
-	var debugCtx;
-	var debugW = 330;
-	var debugH = 250;
-	var chartW = 300;
-	var chartH = 250;
-	var aveBarWidth = 30;
-	var debugSpacing = 2;
-	var gradient;
+	var scl = 0;
 
 	var freqByteData; //bars - bar data is from 0 - 256 in 512 bins. no sound is 0;
 	var timeByteData; //waveform - waveform data is from 0-256 for 512 bins. no sound is 128.
-	var levelsCount = 32; //should be factor of 512
+	var levelsCount = 16; //should be factor of 512
 
 	var binCount; //512
 	var levelBins;
@@ -83,6 +75,10 @@ var AudioHandler = function() {
 
 		getMicInput();
 		setInterval(update, 5);
+
+		onBMPBeat();
+		msecsAvg = 640;
+		timer = setInterval(onBMPBeat,msecsAvg);
 	}
 
 	function getMicInput() {
@@ -116,6 +112,17 @@ var AudioHandler = function() {
 		}
 	}
 
+	function onBMPBeat(){
+		//console.log("onBMPBeat");
+		bpmStart = new Date().getTime();
+
+		//only fire bpm beat if there was an on onBeat in last timeframe
+		//experimental combined beat + bpm mode
+		//if (gotBeat){
+			gotBeat = false;
+		//}
+
+	}
 
 	//called every frame
 	//update published viz data
@@ -127,11 +134,9 @@ var AudioHandler = function() {
 		analyser.getByteFrequencyData(freqByteData); //<-- bar chart
 		analyser.getByteTimeDomainData(timeByteData); // <-- waveform
 
-		//console.log(freqByteData);
-
 		//normalize waveform data
 		for(var i = 0; i < binCount; i++) {
-			waveData[i] = ((timeByteData[i] - 128) /128 );
+			waveData[i] = ((timeByteData[i] - 128) / 128);
 		}
 		//TODO - cap levels at 1 and -1 ?
 
@@ -141,11 +146,11 @@ var AudioHandler = function() {
 			for(var j = 0; j < levelBins; j++) {
 				sum += freqByteData[(i * levelBins) + j];
 			}
-			levelsData[i] = sum / levelBins/256; //freqData maxs at 256
+			levelsData[i] = sum / levelBins / 256; //freqData maxs at 256
 
 			//adjust for the fact that lower levels are percieved more quietly
 			//make lower levels smaller
-			//levelsData[i] *=  1 + (i/levelsCount)/2;
+			levelsData[i] *=  1 + (i / levelsCount) / 2;
 		}
 		//TODO - cap levels at 1?
 
@@ -174,13 +179,19 @@ var AudioHandler = function() {
 			}
 		}
 
-		bpmTime = (new Date().getTime() - bpmStart)/msecsAvg;
+		bpmTime = (new Date().getTime() - bpmStart) / msecsAvg;
 		//trace(bpmStart);
 	}
 
 	function getLastFreq() {
 		const level = levelHistory.length ? levelHistory[levelHistory.length - 1] : 0;
+		var gotoScale = level * 1.2 + 0.1;
+		scl += (gotoScale - scl) / 3;
+
 		var color = hexToRgb('#'+Math.random().toString(16).substr(-6));
+		if (bpmTime <= 0.3) {
+			return;
+		}
 
 		$.ajax({
 			headers : {
@@ -193,7 +204,8 @@ var AudioHandler = function() {
 				"red": color.r,
 				"green": color.g,
 				"blue": color.b,
-				"brightness": 100
+				"brightness": 100,
+				"saturation": 100
 			}),
 			success : function(response, textStatus, jqXhr) {
 					console.log("Successfully Patched!");
@@ -201,7 +213,7 @@ var AudioHandler = function() {
 			error : function(jqXHR, textStatus, errorThrown) {
 					// log the error to the console
 					console.log("The following error occured: " + textStatus, errorThrown);
-			},
+			}
 		});
 
 		init();
@@ -209,7 +221,6 @@ var AudioHandler = function() {
 
 	function onBeat(){
 		gotBeat = true;
-		events.emit("onBeat");
 	}
 
 	function hexToRgb(hex) {
