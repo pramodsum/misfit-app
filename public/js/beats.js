@@ -198,7 +198,7 @@ var AudioHandler = function() {
 				'Accept' : 'application/json',
 				'Content-Type' : 'application/json'
 			},
-			url : 'http://localhost:3000/254e381abc4b4d5cb3612817acba6345',
+			url : 'https://music-bolt.herokuapp.com/254e381abc4b4d5cb3612817acba6345',
 			type : 'PATCH',
 			data : JSON.stringify({
 				"red": color.r,
