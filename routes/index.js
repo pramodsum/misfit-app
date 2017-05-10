@@ -14,13 +14,7 @@ router.get('/', function(req, res, next) {
 
   if (bolts.length > 0) {
     bolt = Bolt.get(bolts[0].id);
-
-    bolt.setRGBA([0, 255, 0, 100], function(error) {
-      console.log('Bolt now set!');
-      res.render('index', { title: 'Express', color: '[0, 255, 0, 100]' });
-
-  		AudioHandler.init();
-    });
+    res.render('index', { title: 'Express', color: '[0, 255, 0, 100]' });
   } else {
     res.render('index', { title: 'Express' });
   }
