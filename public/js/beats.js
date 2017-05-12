@@ -48,6 +48,7 @@ var AudioHandler = function() {
 
 	// Shared color dictionary
 	var colorDictionary = {};
+	var colorEl;
 
 	function init() {
 		//EVENT HANDLERS
@@ -89,6 +90,8 @@ var AudioHandler = function() {
 
 		// Populate the color dictionary
 		loadColorBounds();
+
+		colorEl = document.querySelector('.color');
 	}
 
 	function getMicInput() {
@@ -287,6 +290,7 @@ var AudioHandler = function() {
 		}
 		colorHistory.push(color);
 		console.log(color);
+		colorEl.innerHTML = "Color: " + JSON.stringify(color);
 
 		$.ajax({
 			headers : {
