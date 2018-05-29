@@ -292,28 +292,28 @@ var AudioHandler = function() {
 		console.log(color);
 		colorEl.innerHTML = "Color: " + JSON.stringify(color);
 
-		$.ajax({
-			headers : {
-				'Accept' : 'application/json',
-				'Content-Type' : 'application/json'
-			},
-			url : `${document.URL}254e381abc4b4d5cb3612817acba6345`,
-			type : 'PATCH',
-			data : JSON.stringify({
-				"red": color.r,
-				"green": color.g,
-				"blue": color.b,
-				"brightness": 100,
-				"saturation": 100
-			}),
-			success : function(response, textStatus, jqXhr) {
-					console.log("Successfully Patched!");
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-					// log the error to the console
-					console.log("The following error occured: " + textStatus, errorThrown);
-			}
-		});
+		// $.ajax({
+		// 	headers : {
+		// 		'Accept' : 'application/json',
+		// 		'Content-Type' : 'application/json'
+		// 	},
+		// 	url : `${document.URL}254e381abc4b4d5cb3612817acba6345`,
+		// 	type : 'PATCH',
+		// 	data : JSON.stringify({
+		// 		"red": color.r,
+		// 		"green": color.g,
+		// 		"blue": color.b,
+		// 		"brightness": 100,
+		// 		"saturation": 100
+		// 	}),
+		// 	success : function(response, textStatus, jqXhr) {
+		// 			console.log("Successfully Patched!");
+		// 	},
+		// 	error : function(jqXHR, textStatus, errorThrown) {
+		// 			// log the error to the console
+		// 			console.log("The following error occured: " + textStatus, errorThrown);
+		// 	}
+		// });
 
 		init();
 	}

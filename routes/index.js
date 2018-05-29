@@ -4,6 +4,11 @@ var Bolt = require('misfit-bolt');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  Bolt.init(function(error, rgba) {
+    console.log(error);
+    console.log('Current RGBA values are: ', rgba);
+  });
+
   console.log("---DETECTED BOLTS---");
   const bolts = Bolt.bolts.map((bolt) => {
     console.log('id: ' + bolt.id);
